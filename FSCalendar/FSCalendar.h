@@ -241,6 +241,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 IB_DESIGNABLE
 @interface FSCalendar : UIView
+/**
+ * 当前section
+ */
+@property (assign, nonatomic) NSInteger currntSection;
 
 /**
  * The object that acts as the delegate of the calendar.
@@ -510,6 +514,10 @@ IB_DESIGNABLE
  */
 - (void)handleScopeGesture:(UIPanGestureRecognizer *)sender;
 
+/**
+ 全选当月,仅在 allowsMultipleSelection = YES && placeholderType > 0时可用
+ */
+- (void)selectAllofCurrentMonth;
 @end
 
 

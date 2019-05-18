@@ -241,6 +241,33 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
+- (void)selectAllofCurrentMonth{
+ 
+    __weak __typeof(self) weakSelf = self;
+    [[self visibleCells] enumerateObjectsUsingBlock:^(__kindof FSCalendarCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:idx inSection:self.currntSection];
+        NSDate *selectedDate = [self.calculator dateForIndexPath:indexPath];
+        FSCalendarMonthPosition monthPosition = [self.calculator monthPositionForIndexPath:indexPath];
+        FSCalendarCell *cell;
+        if (monthPosition == FSCalendarMonthPositionCurrent) {
+            //判断是不是当月
+            cell = (FSCalendarCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+       
+        if (![weakSelf.selectedDates containsObject:selectedDate]) {
+            cell.selected = YES;
+            [cell performSelecting];
+        }
+         [self enqueueSelectedDate:selectedDate];
+        [self.delegateProxy calendar:self didSelectDate:selectedDate atMonthPosition:monthPosition];
+        [self selectCounterpartDate:selectedDate];
+        [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+        }
+    }
+   ];
+    
+    
+ }
+
 #pragma mark - Overriden methods
 
 - (void)setBounds:(CGRect)bounds
@@ -427,6 +454,8 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
         cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:FSCalendarDefaultCellReuseIdentifier forIndexPath:indexPath];
     }
     [self reloadDataForCell:cell atIndexPath:indexPath];
+    self.currntSection = indexPath.section;
+
     return cell;
 }
 

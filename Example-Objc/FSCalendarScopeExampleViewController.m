@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_END
         self.calendarHeightConstraint.constant = 400;
     }
     [self.calendar selectDate:[NSDate date] scrollToDate:YES];
-    
+    self.calendar.allowsMultipleSelection = YES;
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self.calendar action:@selector(handleScopeGesture:)];
     panGesture.delegate = self;
     panGesture.minimumNumberOfTouches = 1;
@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_END
     [self.tableView.panGestureRecognizer requireGestureRecognizerToFail:panGesture];
     
     [self.calendar addObserver:self forKeyPath:@"scope" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:_KVOContext];
-    self.calendar.placeholderType = FSCalendarPlaceholderTypeNone;
+    self.calendar.placeholderType = 1;
     self.calendar.scope = FSCalendarScopeWeek;
     
     // For UITest
@@ -144,14 +144,14 @@ NS_ASSUME_NONNULL_END
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger numbers[2] = {2,20};
+    NSInteger numbers[2] = {3,20};
     return numbers[section];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == 0) {
-        NSString *identifier = @[@"cell_month",@"cell_week"][indexPath.row];
+        NSString *identifier = @[@"cell_month",@"cell_week",@"cell_allSelcetOfMonth"][indexPath.row];
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
         return cell;
     } else {
@@ -165,9 +165,11 @@ NS_ASSUME_NONNULL_END
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    if (indexPath.section == 0) {
+    if (indexPath.section == 0 && indexPath.row != 2) {
         FSCalendarScope selectedScope = indexPath.row == 0 ? FSCalendarScopeMonth : FSCalendarScopeWeek;
         [self.calendar setScope:selectedScope animated:self.animationSwitch.on];
+    }else if(indexPath.section == 0){
+        [self.calendar selectAllofCurrentMonth];
     }
     
 }
